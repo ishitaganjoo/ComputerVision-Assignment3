@@ -29,6 +29,7 @@
 #include <dirent.h>
 #include <map>
 #include <numeric>
+#include <fstream>
 
 //Use the cimg namespace to access the functions easily
 using namespace cimg_library;
@@ -40,6 +41,11 @@ typedef map<string, vector<string> > Dataset;
 
 #include <Classifier.h>
 #include <NearestNeighbor.h>
+#include <SimpleBaseline.h>
+#include <Bow.h>
+#include <Deep.h>
+#include <PCA.h>
+#include <Haar.h>
 
 // Figure out a list of files in a given directory.
 //
@@ -79,6 +85,16 @@ int main(int argc, char **argv)
     Classifier *classifier=0;
     if(algo == "nn")
       classifier = new NearestNeighbor(class_list);
+   else if (algo == "baseline")
+	   classifier = new SimpleBaseline(class_list);	
+   else if (algo == "bow")
+     classifier = new Bow(class_list); 
+   else if (algo == "deep")
+     classifier = new Deep(class_list); 
+   else if (algo == "eigen")
+     classifier = new PCA(class_list); 
+   else if (algo == "haar")
+     classifier = new Haar(class_list); 
     else
       throw std::string("unknown classifier " + algo);
 
