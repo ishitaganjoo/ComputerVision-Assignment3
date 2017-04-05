@@ -12,7 +12,7 @@ LDFLAGS = -O3 -lm -Wall
 #LDFLAGS = -pg -lm -Wall 
 
 all: svm_multiclass_learn_hideo svm_multiclass_classify CImg.h a3.cpp Classifier.h NearestNeighbor.h
-	g++ a3.cpp -o a3 -lX11 -lpthread -I. -Isiftpp -O3 siftpp/sift.cpp
+	g++ a3.cpp -o a3 -lX11 -lpthread -I. -Isiftpp -O3 siftpp/sift.cpp -std=c++11
 
 .PHONY: clean
 clean: svm_light_clean svm_struct_clean
