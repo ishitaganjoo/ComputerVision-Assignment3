@@ -3,8 +3,7 @@ class Haar : public Classifier
 public:
   Haar(const vector<string> &_class_list) : Classifier(_class_list) {}
 
-  // Nearest neighbor training. All this does is read in all the images, resize
-  // them to a common size, convert to greyscale, and dump them as vectors to a file
+  // Haar like features training.
   virtual void train(const Dataset &filenames)
   {
 	map<int, vector<CImg<double> > > outputMap;
@@ -15,10 +14,6 @@ public:
 		CImg<double> class_vectors(size*size, filenames.size(), 1);
 
 		vector<CImg<double> > integralImages;
-		//vector<CImg<double> > inputImages;
-
-		// convert each image to be a row of this "model" image
-		//cout<<"size of image is : "<<c_iter->second.size()<<endl;
 		for(int i=0; i<c_iter->second.size(); i++)
 		{
 		   CImg<double> inputImage = extract_features(c_iter->second[i].c_str());
