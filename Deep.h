@@ -37,7 +37,7 @@ public:
   classLabels["taco"] = 23;
   classLabels["tiramisu"] = 24;
   classLabels["waffle"] = 25;
-    ofstream output("deep_train1.dat");
+    ofstream output("deep_train.dat");
     for(Dataset::const_iterator c_iter=filenames.begin(); c_iter != filenames.end(); ++c_iter)
       {   
           // Get each image
@@ -75,11 +75,14 @@ public:
                       }
                   }
                   output<<endl;
+                  file.close();
            }
       }
+      
+
   // Train the svm
   flush(output);
-  string str = "./svm_multiclass_learn -c 0.3 -# 300 -t 2 -g 0.00001 deep_train1.dat deep_model";
+  string str = "./svm_multiclass_learn -c 0.3 -# 300 -t 2 -g 0.00001 deep_train.dat deep_model";
   const char *command = str.c_str();
   system(command);
   }  
@@ -146,13 +149,14 @@ public:
                       count ++;
                       }
                   }
-            output << endl;      
+            output << endl;  
+            file.close();    
           flush(output);
     // figure prediction for this using svm
-    string str1 = "./svm_multiclass_classify deep_test.dat deep_model prediction";
+    string str1 = "./svm_multiclass_classify deep_test.dat deep_model_tank prediction";
     
     const char *command1 = str1.c_str();
-    cout<<"call command"<<endl;
+    //cout<<"call command"<<endl;
     system(command1);
     
     cout<<"Tested"<<endl;
@@ -164,6 +168,7 @@ public:
     while(getline(file1, line1)) {
       cout<< "PREDICTION IS "<<line1<<endl;
       int p = atoi(line1.c_str());
+      file1.close();
     return classLabels[p];
     }
   }
