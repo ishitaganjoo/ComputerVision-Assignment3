@@ -5,8 +5,7 @@ class PCA : public Classifier
 public:
   PCA(const vector<string> &_class_list) : Classifier(_class_list) {}
 
-  // Nearest neighbor training. All this does is read in all the images, resize
-  // them to a common size, convert to greyscale, and dump them as vectors to a file
+  // Principal Component Analysis Training
   virtual void train(const Dataset &filenames)
   {
 	map<int, vector<CImg<double> > > outputMap;
@@ -30,26 +29,6 @@ public:
 
       }
 
-      // CImg<double> tryMatrix(3,3);
-      // tryMatrix(0,0) = 1;
-      // tryMatrix(0,1) = 2;
-      // tryMatrix(0,2) = 3;
-      // tryMatrix(1,0) = 4;
-      // tryMatrix(1,1) = 5;
-      // tryMatrix(1,2) = 6;
-      // tryMatrix(2,0) = 7;
-      // tryMatrix(2,1) = 8;
-      // tryMatrix(2,2) = 9;
-      //
-      // CImg<double> result = computeCovarianceMatrix(tryMatrix);
-      // for(int i=0; i<3; i++){
-      //   for(int j=0; j<3; j++){
-      //     cout<<result(i, j)<<" ";
-      //   }
-      //   cout<<endl;
-      // }
-
-	  //cout<<"map size is"<<outputMap.size()<<endl;
 	  //read each vector in a class and convert it into a matrix
 	  cout<<"before opening train"<<endl;
 	  ofstream myFile;
@@ -65,7 +44,6 @@ public:
 				 
 				 vector<double> trainVector = eigenDecomposition(it->second[i], c);
 				 c++;
-				 //cout<<"test vector size is "<<trainVector.size()<<endl;
 				 for(int j = 0; j < trainVector.size(); j++)
 				 {
 					 myFile << j+1 <<":" << trainVector[j]<<" ";
@@ -74,7 +52,6 @@ public:
 			}
 		}
 
-		//cout<<"outside for "<<endl;
 		myFile.flush();
 		myFile.close();
 
@@ -134,37 +111,25 @@ public:
   //create a new method which calculates the matrix and eigen values and vectors
   vector<double> eigenDecomposition(CImg<double> imageVector, int count)
   {
-
-
-	  CImg<double> squareMatrix = imageVector.get_matrix();
-    CImg<double> covarianceMatrix = computeCovarianceMatrix(squareMatrix);
+  	  CImg<double> squareMatrix = imageVector.get_matrix();
+    	  CImg<double> covarianceMatrix = computeCovarianceMatrix(squareMatrix);
 	  //contains eigen values and eigen vectors
 	  CImgList<double> listImages = covarianceMatrix.get_symmetric_eigen();
 
-	  //CImg<double> class_vectors(size*size, 1, 1);
-      //cout<<"eigen vector width"<<listImages[1].height() << listImages[1].width()<<endl;
 	  vector<double> trainVector;
 	  const char axis= 'x';
-	  //listImages[1].sort(false, axis);
 	  CImg<double> plotImages(size, 20);
 	  for(int i = 0; i<5; i++)
 	  {
 		  vector<double> sortedMatrix;
 		  for(int j = 0; j<size; j++)
 		  {
+		  	//listImages[0] gives the eigen values and listImages[1] gives the eigen vectors.
+		  	//The below code can be uncommented to see the eigen values.
 			 //cout<<"eigen values in columns are"<<listImages[0](j,i)<<endl;
 			 plotImages(j,i) = listImages[1](j,i);
-			 //sortedMatrix.push_back(listImages[1](j,i));
 			 trainVector.push_back(listImages[1](j,i));
 		  }
-		  //cout<<"next column"<<endl;
-		  //sort(sortedMatrix.begin(), sortedMatrix.end());
-		  //for(int k=size-1; k>300; k--)
-		  //{
-			 // cout<<"values are"<<sortedMatrix[k]<<endl;
-			  //trainVector.push_back(sortedMatrix[k]);
-		  //}
-		  //break;
 	  }
 	  //count++;
 	  std::string countFile = std::to_string(count);
@@ -172,11 +137,6 @@ public:
 // This is the code where the images of the eigen vectors are created. You can uncomment this code to see the images created.
 	string fileName = "vectorImage"+countFile+".png";
 	  //plotImages.get_normalize(0,255).save(fileName.c_str());
-	  //choose top k eigen vectors
-	  //class_vectors = class_vectors.draw_image(0, 0, 0, 0, testVector);
-
-	  //class_vectors.save_png(("nn_model. eigenVectorImage .png"));
-	  //CImg<double> eigenVectors = listImages[1].get_vector();
 
 	  return trainVector;
   }
