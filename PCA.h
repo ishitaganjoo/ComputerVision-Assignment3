@@ -2,32 +2,51 @@ class PCA : public Classifier
 {
 public:
   PCA(const vector<string> &_class_list) : Classifier(_class_list) {}
-  
+
   // Nearest neighbor training. All this does is read in all the images, resize
   // them to a common size, convert to greyscale, and dump them as vectors to a file
-  virtual void train(const Dataset &filenames) 
+  virtual void train(const Dataset &filenames)
   {
-	map<int, vector<CImg<double> > > outputMap; 
+	map<int, vector<CImg<double> > > outputMap;
 	int count = 0;
     for(Dataset::const_iterator c_iter=filenames.begin(); c_iter != filenames.end(); ++c_iter)
       {
 		cout << "Processing " << c_iter->first << endl;
 		CImg<double> class_vectors(size*size, filenames.size(), 1);
-		
+
 		vector<CImg<double> > imageVectors;
-		
+
 		// convert each image to be a row of this "model" image
-		for(int i=0; i<c_iter->second.size(); i++) 
+		for(int i=0; i<c_iter->second.size(); i++)
 		{
 		   CImg<double> features = extract_features(c_iter->second[i].c_str());
 		   imageVectors.push_back(features);
 		}
-	  
-		
+
+
 		outputMap[++count] = imageVectors;
-	
+
       }
-	  
+
+      // CImg<double> tryMatrix(3,3);
+      // tryMatrix(0,0) = 1;
+      // tryMatrix(0,1) = 2;
+      // tryMatrix(0,2) = 3;
+      // tryMatrix(1,0) = 4;
+      // tryMatrix(1,1) = 5;
+      // tryMatrix(1,2) = 6;
+      // tryMatrix(2,0) = 7;
+      // tryMatrix(2,1) = 8;
+      // tryMatrix(2,2) = 9;
+      //
+      // CImg<double> result = computeCovarianceMatrix(tryMatrix);
+      // for(int i=0; i<3; i++){
+      //   for(int j=0; j<3; j++){
+      //     cout<<result(i, j)<<" ";
+      //   }
+      //   cout<<endl;
+      // }
+
 	  //cout<<"map size is"<<outputMap.size()<<endl;
 	  //read each vector in a class and convert it into a matrix
 	  cout<<"before opening train"<<endl;
@@ -49,54 +68,106 @@ public:
 				 myFile << endl;
 			}
 		}
-		
+
 		//cout<<"outside for "<<endl;
 		myFile.flush();
 		myFile.close();
-		
+
 		system("./svm_multiclass_learn -c 1.0 train.dat training_model.dat");
   }
-  
+
+  CImg<double> computeCovarianceMatrix(CImg<double> originalMatrix){
+    CImg<double> deviationMatrix(size, size);
+    CImg<double> covarianceMatrix(size, size);
+    CImg<double> covarianceMatrix_Final(size, size);
+    CImg<int> oneMatrix(size, size);
+    for(int i=0 ;i<size; i++){
+      for(int j=0 ; j<size; j++){
+        oneMatrix(i, j) = 1;
+	       deviationMatrix(i, j) = 0;
+         covarianceMatrix(i, j) = 0;
+         covarianceMatrix_Final(i, j) = 0;
+      }
+    }
+
+    for(int i=0; i<size; i++){
+      for(int j=0; j<size; j++){
+        for(int k=0; k<size; k++){
+          deviationMatrix(i, j) += oneMatrix(i, k) * originalMatrix(k, j);
+        }
+      }
+    }
+    for(int i=0; i<size; i++){
+      for(int j=0; j<size; j++){
+        deviationMatrix(i, j) = deviationMatrix(i, j)/size;
+      }
+    }
+    for(int i=0; i<size; i++){
+      for(int j=0; j<size; j++){
+        covarianceMatrix(i, j) = originalMatrix(i, j) - deviationMatrix(i, j);
+      }
+    }
+
+    CImg<double> covarianceTranspose = covarianceMatrix.get_transpose();
+    for(int i=0; i<size; i++){
+      for(int j=0; j<size; j++){
+        for(int k=0; k<size; k++){
+          covarianceMatrix_Final(i, j) += covarianceTranspose(i, k) * covarianceMatrix(k, j);
+        }
+      }
+    }
+    //return covarianceMatrix_Final;
+    for(int i=0; i<size; i++){
+      for(int j=0; j<size; j++){
+        covarianceMatrix_Final(i, j) = covarianceMatrix_Final(i, j)/size;
+      }
+    }
+
+    return covarianceMatrix_Final;
+  }
+
   //create a new method which calculates the matrix and eigen values and vectors
   vector<double> eigenDecomposition(CImg<double> imageVector)
   {
-	  
+
+
 	  CImg<double> squareMatrix = imageVector.get_matrix();
+    CImg<double> covarianceMatrix = computeCovarianceMatrix(squareMatrix);
 	  //contains eigen values and eigen vectors
-	  CImgList<double> listImages = squareMatrix.get_symmetric_eigen();
-	  
+	  CImgList<double> listImages = covarianceMatrix.get_symmetric_eigen();
+
 	  //CImg<double> class_vectors(size*size, 1, 1);
       //cout<<"eigen vector width"<<listImages[1].height() << listImages[1].width()<<endl;
 	  vector<double> trainVector;
 	  const char axis= 'x';
-	  listImages[1].sort(false, axis);
-	  for(int i = 0; i<size; i++)
+	  //listImages[1].sort(false, axis);
+	  for(int i = 0; i<20; i++)
 	  {
 		  vector<double> sortedMatrix;
 		  for(int j = 0; j<size; j++)
 		  {
-			 //cout<<"vectors in columns are"<<listImages[1](j,i)<<endl;
-			 sortedMatrix.push_back(listImages[1](j,i));
-			 //trainVector.push_back(listImages[1](j,i));
+			 //cout<<"vectors in columns are"<<listImages[0](j,i)<<endl;
+			 //sortedMatrix.push_back(listImages[1](j,i));
+			 trainVector.push_back(listImages[1](j,i));
 		  }
 		  //cout<<"next column"<<endl;
-		  sort(sortedMatrix.begin(), sortedMatrix.end());
-		  for(int k=0; k<200; k++)
-		  {
-			  //cout<<"values are"<<sortedMatrix[k]<<endl;
-			  trainVector.push_back(sortedMatrix[k]);
-		  }
+		  //sort(sortedMatrix.begin(), sortedMatrix.end());
+		  //for(int k=size-1; k>300; k--)
+		  //{
+			 // cout<<"values are"<<sortedMatrix[k]<<endl;
+			  //trainVector.push_back(sortedMatrix[k]);
+		  //}
 		  //break;
 	  }
 	  //choose top k eigen vectors
 	  //class_vectors = class_vectors.draw_image(0, 0, 0, 0, testVector);
-	
+
 	  //class_vectors.save_png(("nn_model. eigenVectorImage .png"));
 	  //CImg<double> eigenVectors = listImages[1].get_vector();
-	  
+
 	  return trainVector;
   }
-  
+
   virtual string classify(const string &filename, int actualClass)
   {
 	  map<int, string> classLabels;
@@ -129,15 +200,15 @@ public:
     CImg<double> test_image = extract_features(filename);
 	vector<CImg<double> > imageVectors;
 	imageVectors.push_back(test_image);
-	outputMap[actualClass] = imageVectors;    
+	outputMap[actualClass] = imageVectors;
 
-	
+
 	ofstream myFile;
 	myFile.open("test_pca.dat");
-	
+
 	for(map<int, vector<CImg<double> > >::iterator it = outputMap.begin();it!=outputMap.end();++it)
 	{
-		
+
 		for(int i=0; i<it->second.size(); i++)
 		{
 			 myFile << actualClass <<" ";
@@ -164,7 +235,7 @@ public:
     return classLabels[p];
 	}
   }
-  
+
 
   virtual void load_model()
   {
@@ -172,7 +243,7 @@ public:
       //models[class_list[c] ] = (CImg<double>(("nn_model." + class_list[c] + ".png").c_str()));
   }
 protected:
-  // extract features from an image, which in this case just involves resampling and 
+  // extract features from an image, which in this case just involves resampling and
   // rearranging into a vector of pixel data.
   CImg<double> extract_features(const string &filename)
     {
