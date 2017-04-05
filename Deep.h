@@ -82,7 +82,7 @@ public:
 
   // Train the svm
   flush(output);
-  string str = "./svm_multiclass_learn -c 0.3 -# 300 -t 2 -g 0.00001 deep_train.dat deep_model";
+  string str = "./svm_multiclass_learn -c 0.1 -# 1 deep_train.dat deep_model";
   const char *command = str.c_str();
   system(command);
   }  
@@ -153,7 +153,7 @@ public:
             file.close();    
           flush(output);
     // figure prediction for this using svm
-    string str1 = "./svm_multiclass_classify deep_test.dat deep_model_tank prediction";
+    string str1 = "./svm_multiclass_classify deep_test.dat deep_model prediction";
     
     const char *command1 = str1.c_str();
     //cout<<"call command"<<endl;
