@@ -43,7 +43,7 @@ public:
 	  //apply filters on all the integralImages
 	  calculateHaarFeatures(filters,outputMap);
 	  cout<<"before executing"<<endl;
-	  system("./svm_multiclass_learn -c 0.3 -# 300 -t 2 train.dat training_model.dat");
+	  system("./svm_multiclass_learn -c 0.5 train.dat training_model.dat");
       cout<<"after executing"<<endl;
 
   }
@@ -172,9 +172,9 @@ public:
 				myFile << classNum <<" ";
 				vector<double> imageDescriptor = applyFilter4(it->second[i], filters);
         vector<double> imageDescriptor_2 = applyFilter(it->second[i], filters);
-        for(int j = 0; j<imageDescriptor_2.size(); j++){
-          imageDescriptor.push_back(imageDescriptor_2[j]);
-        }
+        //for(int j = 0; j<imageDescriptor_2.size(); j++){
+        //  imageDescriptor.push_back(imageDescriptor_2[j]);
+       // }
 				for(int j = 0; j<imageDescriptor.size(); j++)
 				{
 					myFile << j+1 <<":" << imageDescriptor[j]<<" ";
@@ -189,7 +189,7 @@ public:
 
   }
 
-    void calculateHaarFeatures_2(vector<CImg<double> > filters, map<int, vector<CImg<double> > > outputMap)
+    void calculateHaarFeatures_2(vector<CImg<double> > filters, map<int, vector<CImg<double> > > outputMap, int actualClass)
   {
 	  ofstream myFile;
 	  myFile.open("test.dat");
@@ -200,12 +200,12 @@ public:
 			for(int i=0; i<it->second.size(); i++)
 			{
 				//cout<<"ishita "<<it->second.size()<<endl;
-				myFile << classNum <<" ";
+				myFile << actualClass <<" ";
 				vector<double> imageDescriptor = applyFilter4(it->second[i], filters);
         vector<double> imageDescriptor_2 = applyFilter(it->second[i], filters);
-        for(int j = 0; j<imageDescriptor_2.size(); j++){
-          imageDescriptor.push_back(imageDescriptor_2[j]);
-        }
+        //for(int j = 0; j<imageDescriptor_2.size(); j++){
+         // imageDescriptor.push_back(imageDescriptor_2[j]);
+       // }
 				for(int j = 0; j<imageDescriptor.size(); j++)
 				{
 					myFile << j+1 <<":" << imageDescriptor[j]<<" ";
@@ -582,7 +582,7 @@ public:
 	  createFilters(&filters);
 	  //cout<<"size of output map"<<outputMap.size()<<endl;
 	  //apply filters on all the integralImages
-	  calculateHaarFeatures_2(filters,outputMap);
+	  calculateHaarFeatures_2(filters,outputMap, actualClass);
 	  //cout<<"before executing"<<endl;
 	  system("./svm_multiclass_classify test.dat training_model.dat predictions.dat");
     string line;
@@ -622,6 +622,6 @@ protected:
       return (CImg<double>(filename.c_str())).get_RGBtoHSI().get_channel(2).resize(size,size,1,1,3);
     }
 
-  static const int size=20;  // subsampled image resolution
+  static const int size=256;  // subsampled image resolution
   map<string, CImg<double> > models; // trained models
 };
