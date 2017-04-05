@@ -9,26 +9,55 @@ public:
   virtual void train(const Dataset &filenames) = 0;
 
   // Classify a single image.
-  virtual string classify(const string &filename) = 0;
+  virtual string classify(const string &filename, int actualClass) = 0;
 
   // Load in a trained model.
   virtual void load_model() = 0;
 
   // Loop through all test images, hiding correct labels and checking if we get them right.
   void test(const Dataset &filenames)
-  {
+  {   map<string, int> classLabels;
+  classLabels["bagel"] = 1;
+  classLabels["bread"] = 2;
+  classLabels["brownie"] = 3;
+  classLabels["chickennugget"] = 4;
+  classLabels["churro"] = 5;
+  classLabels["croissant"] = 6;
+  classLabels["frenchfries"] = 7;
+  classLabels["hamburger"] = 8;
+  classLabels["hotdog"] = 9;
+  classLabels["jambalaya"] = 10;
+  classLabels["kungpaochicken"] = 11;
+  classLabels["lasagna"] = 12;
+  classLabels["muffin"] = 13;
+  classLabels["paella"] = 14;
+  classLabels["pizza"] = 15;
+  classLabels["popcorn"] = 16;
+  classLabels["pudding"] = 17;
+  classLabels["salad"] = 18;
+  classLabels["salmon"] = 19;
+  classLabels["scone"] = 20;
+  classLabels["spaghetti"] = 21;
+  classLabels["sushi"] = 22;
+  classLabels["taco"] = 23;
+  classLabels["tiramisu"] = 24;
+  classLabels["waffle"] = 25;
+  // Simple Baseline training.
     cerr << "Loading model..." << endl;
     load_model();
 
     // loop through images, doing classification
     map<string, map<string, string> > predictions;
-    for(map<string, vector<string> >::const_iterator c_iter=filenames.begin(); c_iter != filenames.end(); ++c_iter) 
+    int count = 0;
+    for(map<string, vector<string> >::const_iterator c_iter=filenames.begin(); c_iter != filenames.end(); ++c_iter) {
+      count ++;
       for(vector<string>::const_iterator f_iter = c_iter->second.begin(); f_iter != c_iter->second.end(); ++f_iter)
+    
 	{
 	  cerr << "Classifying " << *f_iter << "..." << endl;
-	  predictions[c_iter->first][*f_iter]=classify(*f_iter);
+	  predictions[c_iter->first][*f_iter]=classify(*f_iter, classLabels[c_iter->first]);
 	}
-    
+    }
     // now score!
     map< string, map< string, double > > confusion;
     int correct=0, total=0;
