@@ -50,7 +50,7 @@ public:
               string str = "./overfeat/bin/linux_64/overfeat -f "+name+" > overfeatTemp";
               const char *command = str.c_str();
               system(command);
-              cout <<"DONE "<< name<<endl;
+              //cout <<"DONE "<< name<<endl;
               int count = 1;
               output << classLabels[c_iter->first] <<" ";// save class
               bool flag = false;
