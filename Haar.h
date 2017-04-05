@@ -23,12 +23,6 @@ public:
 		{
 		   CImg<double> inputImage = extract_features(c_iter->second[i].c_str());
 
-		   //cout<<"size of image is : "<<(CImg<double>(c_iter->second[i].c_str())).width()<<endl;
-		   //cout<<"height is: "<<inputImage.height()<<"width is: "<<inputImage.width()<<endl;
-		   //CImgList<double> listImages(2);
-		   //listImages[0] = calculateIntegralImage(inputImage);
-		   //listImages[1] = inputImage;
-		   //inputImages.push_back(inputImage);
 		   integralImages.push_back(calculateIntegralImage(inputImage));
 		}
 
@@ -138,16 +132,7 @@ public:
 	  filter7(2,2) = -1;
 
 	  filter8 = filter7.get_rotate(90,1,0);
-	  //cout<<"rotated image is :"<<filter5(0,0) <<filter5(0,1) <<filter5(0,2) <<filter5(1,0) <<filter5(1,1)
-	  //<<filter5(1,2) <<filter5(2,0) <<filter5(2,1) <<filter5(2,2)<<endl;
-	  //cout<<"rotated image is :"<<filter6(0,0) <<filter6(0,1) <<filter6(0,2) <<filter6(1,0) <<filter6(1,1)
-	  //<<filter6(1,2) <<filter6(2,0) <<filter6(2,1) <<filter6(2,2)<<endl;
-	  //cout<<"rotated image is :"<<filter7(0,0) <<filter7(0,1) <<filter7(0,2) <<filter7(1,0) <<filter7(1,1)
-	  //<<filter7(1,2) <<filter7(2,0) <<filter7(2,1) <<filter7(2,2)<<endl;
-	  //cout<<"rotated image is :"<<filter8(0,0) <<filter8(0,1) <<filter8(0,2) <<filter8(1,0) <<filter8(1,1)
-	  //<<filter8(1,2) <<filter8(2,0) <<filter8(2,1) <<filter8(2,2)<<endl;
-	  //cout<<"rotated image is :"<<filter3(0,0) <<filter3(0,1) <<filter3(1,0) <<filter3(1,1) <<endl;
-	  //cout<<"rotated image is :"<<filter4(0,0) <<filter4(0,1) <<filter4(1,0) <<filter4(1,1) <<endl;
+
 	  filters->push_back(filter1);
 	  filters->push_back(filter2);
       filters->push_back(filter3);
@@ -199,7 +184,6 @@ public:
 			classNum++;
 			for(int i=0; i<it->second.size(); i++)
 			{
-				//cout<<"ishita "<<it->second.size()<<endl;
 				myFile << actualClass <<" ";
 				vector<double> imageDescriptor = applyFilter4(it->second[i], filters);
         vector<double> imageDescriptor_2 = applyFilter(it->second[i], filters);
@@ -322,23 +306,12 @@ public:
 					  imageDescriptor.push_back(whiteSum-blackSum);
 
 				  }
-				  // else if(i==2)
-				  // {
-					//   blackSum = originalImage(row, col) + originalImage(row+1, col+1);
-					//   whiteSum = originalImage(row, col+1) + originalImage(row+1, col);
-					//   imageDescriptor.push_back(blackSum - whiteSum);
-					//   imageDescriptor.push_back(whiteSum - blackSum);
-          //
-				  // }
 
 			  }
 
 		  }
 
 	  }
-   // for(int i=0; i<imageDescriptor.size(); i++){
-   //   cout<<"imageDescriptor "<<imageDescriptor[i];
-    //}
     return imageDescriptor;
   }
 
@@ -588,24 +561,10 @@ public:
     string line;
     ifstream file;
     file.open("predictions.dat");
-    //cout <<"ORIGINAL IS "<<actualClass<<endl;
     while(getline(file, line)) {
       cout<< "PREDICTION IS "<<line<<endl;
       int p = atoi(line.c_str());
     return classLabels[p];
-  //     //cout<<"after executing"<<endl;
-  //     	//exit(0);
-	//
-	// //calculateHaarFeatures(filters,outputMap);
-  //   // figure nearest neighbor
-  //   pair<string, double> best("", 10e100);
-  //   double this_cost;
-  //   for(int c=0; c<class_list.size(); c++)
-  //     for(int row=0; row<models[ class_list[c] ].height(); row++)
-	// if((this_cost = (test_image - models[ class_list[c] ].get_row(row)).magnitude()) < best.second)
-	//   best = make_pair(class_list[c], this_cost);
-  //
-  //   return best.first;
   }
 }
 
