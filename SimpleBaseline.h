@@ -55,7 +55,7 @@ public:
 	
       }
       // Write the map to an example file to be used by the SVM trainer.
-      ofstream output("train.dat");
+      ofstream output("train_baseline.dat");
      
 
     for(map<int, vector<CImg<double> > >::iterator it = outputMap.begin();it!=outputMap.end();++it){
@@ -75,7 +75,7 @@ public:
 
   }
    flush(output);
-  string str = "./svm_multiclass_learn -c 0.1 -# 11000 -t 0 train.dat model";
+  string str = "./svm_multiclass_learn -c 0.1 -# 11000 -t 0 train_baseline.dat model_baseline";
    const char *command = str.c_str();
    system(command);
 }
@@ -109,7 +109,7 @@ public:
   classLabels[25] = "waffle";
     CImg<double> test_image = extract_features(filename);
 	 // Create test file for this test image for SVM to run.
-      ofstream output("test.dat");
+      ofstream output("test_baseline.dat");
       
       output << actualClass << " ";
       int lastIndex = test_image.size()-1;
@@ -121,13 +121,13 @@ public:
           output<< (lastIndex+1)<< ":" << test_image[lastIndex]<<"\n";
           flush(output);
     // figure prediction for this using svm
-    string str = "./svm_multiclass_classify test.dat model prediction";
+    string str = "./svm_multiclass_classify test_baseline.dat model_baseline prediction";
     cout<<str<<endl;
     const char *command = str.c_str();
-    cout<<"call command"<<endl;
+    //cout<<"call command"<<endl;
     system(command);
     
-    cout<<"Tested"<<endl;
+    //cout<<"Tested"<<endl;
     //Read the prediction 
     string line;
     ifstream file;
