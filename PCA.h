@@ -1,3 +1,5 @@
+#include <string>
+
 class PCA : public Classifier
 {
 public:
@@ -53,13 +55,16 @@ public:
 	  ofstream myFile;
 	  myFile.open("train.dat");
 	  int classNum = 0;
+	  int c = 0;
 	  for(map<int, vector<CImg<double> > >::iterator it = outputMap.begin();it!=outputMap.end();++it)
 		{
 			classNum++;
 			for(int i=0; i<it->second.size(); i++)
 			{
 				 myFile << classNum <<" ";
-				 vector<double> trainVector = eigenDecomposition(it->second[i]);
+				 
+				 vector<double> trainVector = eigenDecomposition(it->second[i], c);
+				 c++;
 				 //cout<<"test vector size is "<<trainVector.size()<<endl;
 				 for(int j = 0; j < trainVector.size(); j++)
 				 {
@@ -73,7 +78,7 @@ public:
 		myFile.flush();
 		myFile.close();
 
-		system("./svm_multiclass_learn -c 1.0 train.dat training_model.dat");
+		//system("./svm_multiclass_learn -c 1.0 train.dat training_model.dat");
   }
 
   CImg<double> computeCovarianceMatrix(CImg<double> originalMatrix){
@@ -127,7 +132,7 @@ public:
   }
 
   //create a new method which calculates the matrix and eigen values and vectors
-  vector<double> eigenDecomposition(CImg<double> imageVector)
+  vector<double> eigenDecomposition(CImg<double> imageVector, int count)
   {
 
 
@@ -141,12 +146,14 @@ public:
 	  vector<double> trainVector;
 	  const char axis= 'x';
 	  //listImages[1].sort(false, axis);
+	  CImg<double> plotImages(size, 20);
 	  for(int i = 0; i<20; i++)
 	  {
 		  vector<double> sortedMatrix;
 		  for(int j = 0; j<size; j++)
 		  {
-			 //cout<<"vectors in columns are"<<listImages[0](j,i)<<endl;
+			 cout<<"eigen values in columns are"<<listImages[0](j,i)<<endl;
+			 plotImages(j,i) = listImages[1](j,i);
 			 //sortedMatrix.push_back(listImages[1](j,i));
 			 trainVector.push_back(listImages[1](j,i));
 		  }
@@ -159,6 +166,10 @@ public:
 		  //}
 		  //break;
 	  }
+	  //count++;
+	  std::string countFile = std::to_string(count);
+	  string fileName = "vectorImage"+countFile+".png";
+	  plotImages.get_normalize(0,255).save(fileName.c_str());
 	  //choose top k eigen vectors
 	  //class_vectors = class_vectors.draw_image(0, 0, 0, 0, testVector);
 
@@ -212,7 +223,7 @@ public:
 		for(int i=0; i<it->second.size(); i++)
 		{
 			 myFile << actualClass <<" ";
-			 vector<double> testVector = eigenDecomposition(it->second[i]);
+			 vector<double> testVector = eigenDecomposition(it->second[i], 0);
 			 cout<<"test vector size is "<<testVector.size()<<endl;
 			 for(int j = 0; j < testVector.size(); j++)
 			 {
@@ -250,6 +261,6 @@ protected:
       return (CImg<double>(filename.c_str())).get_RGBtoHSI().get_channel(2).resize(size,size,1,1,3).unroll('x');
     }
 
-  static const int size=500;  // subsampled image resolution
+  static const int size=200;  // subsampled image resolution
   map<string, CImg<double> > models; // trained models
 };
