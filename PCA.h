@@ -78,7 +78,7 @@ public:
 		myFile.flush();
 		myFile.close();
 
-		//system("./svm_multiclass_learn -c 1.0 train.dat training_model.dat");
+		system("./svm_multiclass_learn -c 1.0 train.dat training_model.dat");
   }
 
   CImg<double> computeCovarianceMatrix(CImg<double> originalMatrix){
@@ -147,12 +147,12 @@ public:
 	  const char axis= 'x';
 	  //listImages[1].sort(false, axis);
 	  CImg<double> plotImages(size, 20);
-	  for(int i = 0; i<20; i++)
+	  for(int i = 0; i<5; i++)
 	  {
 		  vector<double> sortedMatrix;
 		  for(int j = 0; j<size; j++)
 		  {
-			 cout<<"eigen values in columns are"<<listImages[0](j,i)<<endl;
+			 //cout<<"eigen values in columns are"<<listImages[0](j,i)<<endl;
 			 plotImages(j,i) = listImages[1](j,i);
 			 //sortedMatrix.push_back(listImages[1](j,i));
 			 trainVector.push_back(listImages[1](j,i));
@@ -168,8 +168,10 @@ public:
 	  }
 	  //count++;
 	  std::string countFile = std::to_string(count);
-	  string fileName = "vectorImage"+countFile+".png";
-	  plotImages.get_normalize(0,255).save(fileName.c_str());
+	  
+// This is the code where the images of the eigen vectors are created. You can uncomment this code to see the images created.
+	string fileName = "vectorImage"+countFile+".png";
+	  //plotImages.get_normalize(0,255).save(fileName.c_str());
 	  //choose top k eigen vectors
 	  //class_vectors = class_vectors.draw_image(0, 0, 0, 0, testVector);
 
