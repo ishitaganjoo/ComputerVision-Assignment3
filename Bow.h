@@ -67,7 +67,7 @@ public:
   classLabels[25] = "waffle";
    
    // Create test file for this test image for SVM to run.
-      ofstream output("test.dat");
+      ofstream output("test_bow.dat");
       output << actualClass<<" ";
       CImg<double> input_image(filename.c_str());
       CImg<double> gray = (input_image).get_RGBtoHSI().get_channel(2);
@@ -116,7 +116,7 @@ public:
           
           flush(output);
     // figure prediction for this using svm
-    string str = "./svm_multiclass_classify test.dat model prediction";
+    string str = "./svm_multiclass_classify test_bow.dat model_bow prediction";
     cout<<str<<endl;
     const char *command = str.c_str();
     cout<<"call command"<<endl;
@@ -198,7 +198,7 @@ protected:
          } 
          //cout<< "first "<< visualVocabulary[0][5];
     // Create training data for svm
-    ofstream output("train.dat");     
+    ofstream output("train_bow.dat");     
     int count = visualVocabulary.size();
     for(Dataset::const_iterator c_iter=filenames.begin(); c_iter != filenames.end(); ++c_iter)
       { 
@@ -232,7 +232,7 @@ protected:
         }
       
       flush(output);
-      string str = "./svm_multiclass_learn -c 0.3 -# 300 -t 2 -g 0.00001 train.dat model";
+      string str = "./svm_multiclass_learn -c 0.3 -# 300 -t 2 -g 0.00001 train_bow.dat model_bow";
       const char *command = str.c_str();
       system(command);
    }
